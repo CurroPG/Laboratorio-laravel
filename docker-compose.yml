@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: bookshelf123
+      MYSQL_DATABASE: bookshelf
+    ports:
+      - "3306:3306"
+    volumes:
+      - bookshelf-db-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: BookShelf
+      APP_ENV: local
+      APP_KEY: base64:8EFWSlDBMDQHVLOSyeMQ64LThLiVcKpg0Zk5nfPxWn8=
+      APP_DEBUG: false
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: bookshelf
+      DB_USERNAME: root
+      DB_PASSWORD: bookshelf123
+    depends_on:
+      - db
+
+volumes:
+  bookshelf-db-data:
+
+networks:
+  default:
+    name: bookshelf-network
